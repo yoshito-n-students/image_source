@@ -1,0 +1,10 @@
+<library path="lib/libimage_source">
+    <class name="image_source/ImageFiles" type="image_source::ImageFiles" base_class_type="nodelet::Nodelet">
+        <description>publish images from local image files</description>
+    </class>
+    <!--
+    <class name="image_source/VideoFile" type="image_source::VideoFile" base_class_type="nodelet::Nodelet">
+        <description>publish images from a local video file</description>
+    </class>
+    -->
+</library>
