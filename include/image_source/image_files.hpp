@@ -18,6 +18,7 @@
 #include <opencv2/highgui.hpp>
 
 #include <boost/filesystem.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/regex.hpp>
 
 namespace image_source {
@@ -34,18 +35,17 @@ private:
     ros::NodeHandle &pnh(getPrivateNodeHandle());
 
     loop_ = pnh.param("loop", true);
-    recursive_ = pnh.param("recursive", false);
-    frame_id_ = pnh.param< std::string >("frame_id", "");
-
     loadDirectories();
 
     publisher_ = image_transport::ImageTransport(nh).advertise("image_out", 1, true);
-
     timer_ = nh.createTimer(ros::Rate(pnh.param("rate", 1.)), &ImageFiles::publish, this);
   }
 
   void loadDirectories() {
     ros::NodeHandle &pnh(getPrivateNodeHandle());
+
+    const bool recursive(pnh.param("recursive", false));
+    const std::string frame_id(pnh.param< std::string >("frame_id", ""));
 
     // load a parameter tree
     XmlRpc::XmlRpcValue paths_tree;
@@ -61,7 +61,7 @@ private:
         XmlRpc::XmlRpcValue &path_tree(paths_tree[i]);
         const boost::filesystem::path directory(static_cast< std::string >(path_tree[0]));
         const boost::regex filename_regex(static_cast< std::string >(path_tree[1]));
-        loadDirectory(directory, filename_regex);
+        loadDirectory(directory, recursive, filename_regex, frame_id);
       }
     } catch (const XmlRpc::XmlRpcException &error) {
       NODELET_ERROR_STREAM("Error in parsing parameter " << pnh.resolveName("images") << ": "
@@ -71,7 +71,8 @@ private:
     }
   }
 
-  void loadDirectory(const boost::filesystem::path &directory, const boost::regex &filename_regex) {
+  void loadDirectory(const boost::filesystem::path &directory, const bool recursive,
+                     const boost::regex &filename_regex, const std::string &frame_id) {
     namespace bf = boost::filesystem;
 
     bf::directory_iterator entry(directory);
@@ -81,8 +82,8 @@ private:
 
       // if directory
       if (bf::is_directory(path)) {
-        if (recursive_) {
-          loadDirectory(path, filename_regex);
+        if (recursive) {
+          loadDirectory(path, recursive, filename_regex, frame_id);
         } else {
           NODELET_INFO_STREAM("Skip directory " << path);
         }
@@ -97,9 +98,9 @@ private:
           continue;
         }
         std_msgs::Header header;
-        header.frame_id = frame_id_;
+        header.frame_id = frame_id;
         // TODO: encoding as parameter
-        queue_.push(cv_bridge::CvImage(header, "bgr8", image).toImageMsg());
+        queue_.push(boost::make_shared< cv_bridge::CvImage >(header, "bgr8", image));
         NODELET_INFO_STREAM("Loaded " << path);
         continue;
       }
@@ -112,21 +113,21 @@ private:
       return;
     }
 
-    const sensor_msgs::ImageConstPtr msg(queue_.front());
+    const cv_bridge::CvImagePtr image(queue_.front());
     queue_.pop();
 
-    publisher_.publish(msg);
+    image->header.stamp = ros::Time::now();
+    publisher_.publish(image->toImageMsg());
 
     if (loop_) {
-      queue_.push(msg);
+      queue_.push(image);
     }
   }
 
 private:
-  bool loop_, recursive_;
-  std::string frame_id_;
+  bool loop_;
 
-  std::queue< sensor_msgs::ImageConstPtr > queue_;
+  std::queue< cv_bridge::CvImagePtr > queue_;
 
   ros::Timer timer_;
   image_transport::Publisher publisher_;
