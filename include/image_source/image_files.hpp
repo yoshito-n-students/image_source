@@ -65,8 +65,11 @@ private:
       }
     } catch (const XmlRpc::XmlRpcException &error) {
       NODELET_ERROR_STREAM("Error in parsing parameter " << pnh.resolveName("images") << ": "
-                                                         << error.getMessage()
-                                                         << ". Will use the default value.");
+                                                         << error.getMessage());
+      return;
+    } catch (const std::runtime_error &error) { // for boost.filesystem and regex
+      NODELET_ERROR_STREAM("Error in parsing parameter " << pnh.resolveName("images") << ": "
+                                                         << error.what());
       return;
     }
   }
