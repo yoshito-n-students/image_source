@@ -61,7 +61,9 @@ private:
         XmlRpc::XmlRpcValue &path_tree(paths_tree[i]);
         const boost::filesystem::path directory(static_cast< std::string >(path_tree[0]));
         const boost::regex filename_regex(static_cast< std::string >(path_tree[1]));
-        loadDirectory(directory, recursive, filename_regex, frame_id);
+        const std::string encoding(path_tree.size() >= 3 ? static_cast< std::string >(path_tree[2])
+                                                         : std::string("bgr8"));
+        loadDirectory(directory, recursive, filename_regex, frame_id, encoding);
       }
     } catch (const XmlRpc::XmlRpcException &error) {
       NODELET_ERROR_STREAM("Error in parsing parameter " << pnh.resolveName("images") << ": "
@@ -75,8 +77,17 @@ private:
   }
 
   void loadDirectory(const boost::filesystem::path &directory, const bool recursive,
-                     const boost::regex &filename_regex, const std::string &frame_id) {
+                     const boost::regex &filename_regex, const std::string &frame_id,
+                     const std::string &encoding) {
     namespace bf = boost::filesystem;
+    namespace si = sensor_msgs::image_encodings;
+
+    const bool is_color(si::isColor(encoding));
+    const bool is_mono(si::isMono(encoding));
+    if (!is_color && !is_mono) {
+      NODELET_ERROR_STREAM("Non color nor mono encoding: " << encoding);
+      return;
+    }
 
     bf::directory_iterator entry(directory);
     bf::directory_iterator entry_end;
@@ -86,7 +97,7 @@ private:
       // if directory
       if (bf::is_directory(path)) {
         if (recursive) {
-          loadDirectory(path, recursive, filename_regex, frame_id);
+          loadDirectory(path, recursive, filename_regex, frame_id, encoding);
         } else {
           NODELET_INFO_STREAM("Skip directory " << path);
         }
@@ -95,15 +106,15 @@ private:
 
       // if regular file matching regex
       if (boost::regex_match(path.filename().string(), filename_regex)) {
-        const cv::Mat image(cv::imread(path.string()));
+        const cv::Mat image(cv::imread(
+            path.string(), is_color ? 1 /* load as color image */ : 0 /* load as mono image */));
         if (image.empty()) {
           NODELET_ERROR_STREAM("Not a valid image file: " << path);
           continue;
         }
         std_msgs::Header header;
         header.frame_id = frame_id;
-        // TODO: encoding as parameter
-        queue_.push(boost::make_shared< cv_bridge::CvImage >(header, "bgr8", image));
+        queue_.push(boost::make_shared< cv_bridge::CvImage >(header, encoding, image));
         NODELET_INFO_STREAM("Loaded " << path);
         continue;
       }
