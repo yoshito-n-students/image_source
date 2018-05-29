@@ -11,8 +11,9 @@ image_out (sensor_msgs/Image)
 ~loop (bool, default: false)
 * loop publishment if true
 
-~images (string[][2], default: \<empty array>)
+~images (string[][2 or 3], default: \<empty array>)
 * array of pairs of directory path and filename regular expression
+* optionally image encoding to be published can be specified
 
 ~recursive (bool, default: false)
 * recursively search images if true
@@ -22,3 +23,6 @@ image_out (sensor_msgs/Image)
 
 ~rate (double, default: 1.0)
 * publish rate
+
+## Examples
+see [launch/test.launch](launch/test.launch)
