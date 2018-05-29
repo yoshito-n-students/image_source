@@ -1,0 +1,19 @@
+<launch>
+    <!-- -->
+    <!-- image publisher -->
+    <node name="image_file_publisher" pkg="nodelet" type="nodelet" 
+          args="standalone image_source/ImageFiles" output="screen">
+        <remap from="image_out" to="image"/>
+        <param name="loop" value="true"/>
+        <param name="recursive" value="true"/>
+        <rosparam param="images" subst_value="true">
+            - [ "dir1", ".+.jpg", "bgr8" ]
+            - [ "dir2", ".+.png", "mono8" ]
+        </rosparam>
+    </node>
+    <!-- -->
+    <!-- image viewer -->
+    <node name="image_viewer" pkg="nodelet" type="nodelet"
+          args="standalone image_view/image" output="screen">
+    </node>
+</launch>
