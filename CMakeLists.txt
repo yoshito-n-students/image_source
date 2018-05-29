@@ -134,6 +134,7 @@ include_directories(
 add_library(
   image_source
   src/image_files.cpp
+  src/video_file.cpp
 )
 
 ## Add cmake target dependencies of the library
