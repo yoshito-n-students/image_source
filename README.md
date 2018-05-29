@@ -13,7 +13,7 @@ image_out (sensor_msgs/Image)
 
 ~images (string[][2 or 3], default: \<empty array>)
 * array of pairs of directory path and filename regular expression
-* optionally image encoding to be published can be specified
+* optionally image encoding to be published can be specified (default is "bgr8")
 
 ~recursive (bool, default: false)
 * recursively search images if true
