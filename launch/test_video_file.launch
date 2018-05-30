@@ -4,7 +4,7 @@
     <node name="image_file_publisher" pkg="nodelet" type="nodelet" 
           args="standalone image_source/VideoFile" output="screen">
         <remap from="image_out" to="image"/>
-        <param name="filename" value="video.mp4"/>
+        <param name="file" value="video.mp4"/>
         <param name="playback_speed" value="2.0"/>
         <param name="loop" value="true"/>
     </node>
