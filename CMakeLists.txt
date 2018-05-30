@@ -24,6 +24,7 @@ find_package(Boost REQUIRED COMPONENTS
 )
 find_package(OpenCV REQUIRED COMPONENTS 
   highgui
+  videoio
 )
 
 
