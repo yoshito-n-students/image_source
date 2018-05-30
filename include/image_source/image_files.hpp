@@ -2,6 +2,7 @@
 #define IMAGE_SOURCE_IMAGE_FILES_HPP
 
 #include <queue>
+#include <stdexcept>
 #include <string>
 
 #include <cv_bridge/cv_bridge.h>
@@ -35,43 +36,36 @@ private:
     ros::NodeHandle &pnh(getPrivateNodeHandle());
 
     loop_ = pnh.param("loop", true);
-    loadDirectories();
+
+    loadDirectories(pnh.param("files", XmlRpc::XmlRpcValue()), pnh.param("recursive", false),
+                    pnh.param< std::string >("frame_id", ""));
+    if (queue_.empty()) {
+      NODELET_FATAL("No image loaded");
+      return;
+    }
 
     publisher_ = image_transport::ImageTransport(nh).advertise("image_out", 1, true);
     timer_ = nh.createTimer(ros::Rate(pnh.param("rate", 1.)), &ImageFiles::publish, this);
   }
 
-  void loadDirectories() {
-    ros::NodeHandle &pnh(getPrivateNodeHandle());
-
-    const bool recursive(pnh.param("recursive", false));
-    const std::string frame_id(pnh.param< std::string >("frame_id", ""));
-
-    // load a parameter tree
-    XmlRpc::XmlRpcValue paths_tree;
-    if (!pnh.getParam("files", paths_tree)) {
-      NODELET_ERROR_STREAM("Error in parsing parameter" << pnh.resolveName("files")
-                                                        << ": No parameter");
-      return;
-    }
-
-    // convert the parameter tree to value
+  void loadDirectories(const XmlRpc::XmlRpcValue &queries, const bool recursive,
+                       const std::string &frame_id) {
     try {
-      for (std::size_t i = 0; i < paths_tree.size(); ++i) {
-        XmlRpc::XmlRpcValue &path_tree(paths_tree[i]);
-        const boost::filesystem::path directory(static_cast< std::string >(path_tree[0]));
-        const boost::regex filename_regex(static_cast< std::string >(path_tree[1]));
-        const std::string encoding(path_tree.size() >= 3 ? static_cast< std::string >(path_tree[2])
-                                                         : std::string("bgr8"));
+      // iterate each directory query
+      for (std::size_t i = 0; i < queries.size(); ++i) {
+        // BOOST_FOREACH cannot be used because XmlRpcValue is not a regular sequence
+        XmlRpc::XmlRpcValue query(queries[i]);
+        const boost::filesystem::path directory(static_cast< std::string >(query[0]));
+        const boost::regex filename_regex(static_cast< std::string >(query[1]));
+        const std::string encoding(query.size() >= 3 ? static_cast< std::string >(query[2])
+                                                     : std::string("bgr8"));
         loadDirectory(directory, recursive, filename_regex, frame_id, encoding);
       }
     } catch (const XmlRpc::XmlRpcException &error) {
-      NODELET_ERROR_STREAM("Error in parsing parameter " << pnh.resolveName("files") << ": "
-                                                         << error.getMessage());
+      NODELET_ERROR_STREAM("Error in loading images: " << error.getMessage());
       return;
     } catch (const std::runtime_error &error) { // for boost.filesystem and regex
-      NODELET_ERROR_STREAM("Error in parsing parameter " << pnh.resolveName("files") << ": "
-                                                         << error.what());
+      NODELET_ERROR_STREAM("Error in loading images: " << error.what());
       return;
     }
   }
@@ -102,11 +96,11 @@ private:
       if (boost::regex_match(path.filename().string(), filename_regex)) {
         const cv::Mat image(cv::imread(path.string()));
         if (image.empty()) {
-          NODELET_ERROR_STREAM("Not a valid image file: " << path);
+          NODELET_WARN_STREAM("Skip invalid image file: " << path);
           continue;
         }
         if (image.type() != cv_type) {
-          NODELET_ERROR_STREAM("Unexpected image type (depth or channels): " << path);
+          NODELET_WARN_STREAM("Skip unexpected type image (depth or channels): " << path);
           continue;
         }
         std_msgs::Header header;
