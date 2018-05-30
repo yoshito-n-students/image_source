@@ -25,4 +25,4 @@ image_out (sensor_msgs/Image)
 * publish rate
 
 ## Examples
-see [launch/test.launch](launch/test.launch)
+see [launch/test_*.launch](launch)
