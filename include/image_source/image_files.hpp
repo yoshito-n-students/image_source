@@ -82,15 +82,9 @@ private:
     namespace bf = boost::filesystem;
     namespace si = sensor_msgs::image_encodings;
 
-    const bool is_color(si::isColor(encoding));
-    const bool is_mono(si::isMono(encoding));
-    if (!is_color && !is_mono) {
-      NODELET_ERROR_STREAM("Non color nor mono encoding: " << encoding);
-      return;
-    }
-
     bf::directory_iterator entry(directory);
     bf::directory_iterator entry_end;
+    const int cv_type(cv_bridge::getCvType(encoding));
     for (; entry != entry_end; ++entry) {
       const bf::path path(entry->path());
 
@@ -106,10 +100,13 @@ private:
 
       // if regular file matching regex
       if (boost::regex_match(path.filename().string(), filename_regex)) {
-        const cv::Mat image(cv::imread(
-            path.string(), is_color ? 1 /* load as color image */ : 0 /* load as mono image */));
+        const cv::Mat image(cv::imread(path.string()));
         if (image.empty()) {
           NODELET_ERROR_STREAM("Not a valid image file: " << path);
+          continue;
+        }
+        if (image.type() != cv_type) {
+          NODELET_ERROR_STREAM("Unexpected image type (depth or channels): " << path);
           continue;
         }
         std_msgs::Header header;
