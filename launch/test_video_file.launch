@@ -1,0 +1,17 @@
+<launch>
+    <!-- -->
+    <!-- image publisher -->
+    <node name="image_file_publisher" pkg="nodelet" type="nodelet" 
+          args="standalone image_source/VideoFile" output="screen">
+        <remap from="image_out" to="image"/>
+        <param name="file" value="video.mp4"/>
+        <param name="playback_speed" value="2.0"/>
+        <param name="loop" value="true"/>
+    </node>
+    <!-- -->
+    <!-- image viewer -->
+    <node name="image_viewer" pkg="nodelet" type="nodelet"
+          args="standalone image_view/image" output="screen">
+        <param name="image_transport" value="compressed"/>
+    </node>
+</launch>
