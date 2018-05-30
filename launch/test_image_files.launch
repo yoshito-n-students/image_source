@@ -7,13 +7,14 @@
         <param name="loop" value="true"/>
         <param name="recursive" value="true"/>
         <rosparam param="files" subst_value="true">
-            - [ "dir1", ".+.jpg", "bgr8" ]
-            - [ "dir2", ".+.png", "mono8" ]
+            - [ "dir1", ".+\\.jpg", "bgr8" ]
+            - [ "dir2", ".+\\.png", "mono8" ]
         </rosparam>
     </node>
     <!-- -->
     <!-- image viewer -->
     <node name="image_viewer" pkg="nodelet" type="nodelet"
           args="standalone image_view/image" output="screen">
+        <param name="image_transport" value="compressed"/>
     </node>
 </launch>
