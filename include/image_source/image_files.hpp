@@ -49,8 +49,8 @@ private:
 
     // load a parameter tree
     XmlRpc::XmlRpcValue paths_tree;
-    if (!pnh.getParam("images", paths_tree)) {
-      NODELET_ERROR_STREAM("Error in parsing parameter" << pnh.resolveName("images")
+    if (!pnh.getParam("files", paths_tree)) {
+      NODELET_ERROR_STREAM("Error in parsing parameter" << pnh.resolveName("files")
                                                         << ": No parameter");
       return;
     }
@@ -66,11 +66,11 @@ private:
         loadDirectory(directory, recursive, filename_regex, frame_id, encoding);
       }
     } catch (const XmlRpc::XmlRpcException &error) {
-      NODELET_ERROR_STREAM("Error in parsing parameter " << pnh.resolveName("images") << ": "
+      NODELET_ERROR_STREAM("Error in parsing parameter " << pnh.resolveName("files") << ": "
                                                          << error.getMessage());
       return;
     } catch (const std::runtime_error &error) { // for boost.filesystem and regex
-      NODELET_ERROR_STREAM("Error in parsing parameter " << pnh.resolveName("images") << ": "
+      NODELET_ERROR_STREAM("Error in parsing parameter " << pnh.resolveName("files") << ": "
                                                          << error.what());
       return;
     }
