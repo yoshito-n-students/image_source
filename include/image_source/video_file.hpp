@@ -27,7 +27,7 @@ private:
     encoding_ = pnh.param< std::string >("encoding", "bgr8");
     loop_ = pnh.param("loop", false);
 
-    const std::string filename(pnh.param< std::string >("filename", ""));
+    const std::string filename(pnh.param< std::string >("file", ""));
     if (filename.empty()) {
       NODELET_FATAL("No video filename");
       return;
