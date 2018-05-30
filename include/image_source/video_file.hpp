@@ -25,6 +25,7 @@ private:
 
     frame_id_ = pnh.param< std::string >("frame_id", "");
     encoding_ = pnh.param< std::string >("encoding", "bgr8");
+    cv_type_ = cv_bridge::getCvType(encoding_);
     loop_ = pnh.param("loop", false);
 
     const std::string filename(pnh.param< std::string >("file", ""));
@@ -65,6 +66,7 @@ private:
     image.header.frame_id = frame_id_;
     image.encoding = encoding_;
 
+    // playback from start if the video ends and loop option is enabled
     if (video_.get(cv::CAP_PROP_POS_FRAMES) == frame_count_) {
       if (loop_) {
         video_.set(cv::CAP_PROP_POS_FRAMES, 0.);
@@ -73,15 +75,26 @@ private:
         return;
       }
     }
+
+    // read the next frame
     video_.read(image.image);
 
-    // TODO: convert image format according to encoding_
+    // validate the image
+    if (image.image.empty()) {
+      NODELET_ERROR("Could not read a frame");
+      return;
+    }
+    if (image.image.type() != cv_type_) {
+      NODELET_ERROR("Unexpected image type");
+      return;
+    }
 
     publisher_.publish(image.toImageMsg());
   }
 
 private:
   std::string frame_id_, encoding_;
+  int cv_type_;
   bool loop_;
   double frame_count_;
 
