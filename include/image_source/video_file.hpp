@@ -75,6 +75,8 @@ private:
     }
     video_.read(image.image);
 
+    // TODO: convert image format according to encoding_
+
     publisher_.publish(image.toImageMsg());
   }
 
