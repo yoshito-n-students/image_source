@@ -7,6 +7,11 @@ ROS nodelets to convert a local image file to a message
 ### Published topics
 image_out (sensor_msgs/Image)
 
+### Services
+publish (std_srvs/Empty)
+* publish the next image by a call
+* never advertised unless ~publish_by_call is true
+
 ### Parameters
 ~loop (bool, default: false)
 * loop publishment if true
@@ -21,8 +26,11 @@ image_out (sensor_msgs/Image)
 ~frame_id (string, default: "")
 * frame_id of published images
 
+~publish_by_call (bool, default: false)
+* publish by call or by timer
+
 ~rate (double, default: 1.0)
-* publish rate
+* publish rate of the timer
 
 ## Nodelet: VideoFile
 * publish image messages from a local video file
@@ -43,8 +51,11 @@ image_out (sensor_msgs/Image)
 ~encoding (string, default: "bgr8")
 * encoding of image messages
 
+~publish_by_call (bool, default: false)
+* publish by call or by timer
+
 ~playback_speed (double, default: 1.0)
-* playback speed of video
+* playback speed of video to set rate of timer
 
 
 ## Examples
