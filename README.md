@@ -38,6 +38,11 @@ publish (std_srvs/Empty)
 ### Published topics
 image_out (sensor_msgs/Image)
 
+### Services
+publish (std_srvs/Empty)
+* publish the next image by a call
+* never advertised unless ~publish_by_call is true
+
 ### Parameters
 ~loop (bool, default: false)
 * loop publishment if true
