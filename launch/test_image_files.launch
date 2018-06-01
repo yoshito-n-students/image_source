@@ -6,6 +6,8 @@
         <remap from="image_out" to="image"/>
         <param name="loop" value="true"/>
         <param name="recursive" value="true"/>
+        <param name="publish_by_call" value="true"/>
+        <!-- <param name="rate" value="2.0"/> -->
         <rosparam param="files" subst_value="true">
             - [ "dir1", ".+\\.jpg", "bgr8" ]
             - [ "dir2", ".+\\.png", "mono8" ]
