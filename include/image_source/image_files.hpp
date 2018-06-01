@@ -10,9 +10,12 @@
 #include <image_transport/publisher.h>
 #include <nodelet/nodelet.h>
 #include <ros/node_handle.h>
+#include <ros/service_server.h>
+#include <ros/time.h>
 #include <ros/timer.h>
 #include <sensor_msgs/Image.h>
 #include <std_msgs/Header.h>
+#include <std_srvs/Empty.h>
 #include <xmlrpcpp/XmlRpcException.h>
 #include <xmlrpcpp/XmlRpcValue.h>
 
@@ -45,7 +48,11 @@ private:
     }
 
     publisher_ = image_transport::ImageTransport(nh).advertise("image_out", 1, true);
-    timer_ = nh.createTimer(ros::Rate(pnh.param("rate", 1.)), &ImageFiles::publish, this);
+    if (pnh.param("publish_by_call", false)) {
+      server_ = nh.advertiseService("publish", &ImageFiles::publishByCall, this);
+    } else {
+      timer_ = nh.createTimer(ros::Rate(pnh.param("rate", 1.)), &ImageFiles::publishByTimer, this);
+    }
   }
 
   void loadDirectories(const XmlRpc::XmlRpcValue &queries, const bool recursive,
@@ -112,10 +119,10 @@ private:
     }
   }
 
-  void publish(const ros::TimerEvent &) {
+  bool publish() {
     if (queue_.empty()) {
       NODELET_INFO_ONCE("No more images to be published");
-      return;
+      return false;
     }
 
     const cv_bridge::CvImagePtr image(queue_.front());
@@ -127,7 +134,13 @@ private:
     if (loop_) {
       queue_.push(image);
     }
+
+    return true;
   }
+
+  void publishByTimer(const ros::TimerEvent &) { publish(); }
+
+  bool publishByCall(std_srvs::Empty::Request &, std_srvs::Empty::Response &) { return publish(); }
 
 private:
   bool loop_;
@@ -135,6 +148,7 @@ private:
   std::queue< cv_bridge::CvImagePtr > queue_;
 
   ros::Timer timer_;
+  ros::ServiceServer server_;
   image_transport::Publisher publisher_;
 };
 

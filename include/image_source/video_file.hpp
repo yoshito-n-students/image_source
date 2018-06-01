@@ -7,7 +7,10 @@
 #include <nodelet/nodelet.h>
 #include <ros/node_handle.h>
 #include <ros/rate.h>
+#include <ros/service_server.h>
+#include <ros/time.h>
 #include <ros/timer.h>
+#include <std_srvs/Empty.h>
 
 #include <opencv2/videoio.hpp>
 
@@ -44,23 +47,26 @@ private:
       return;
     }
 
-    const double original_fps(video_.get(cv::CAP_PROP_FPS));
-    if (original_fps <= 0.) {
-      NODELET_FATAL("Could not get fps from the video file");
-      return;
-    }
-
-    const double playback_speed(pnh.param("playback_speed", 1.));
-    if (playback_speed <= 0.) {
-      NODELET_FATAL_STREAM("Invalid playback_speed: " << playback_speed);
-      return;
-    }
-
     publisher_ = image_transport::ImageTransport(nh).advertise("image_out", 1, true);
-    timer_ = nh.createTimer(ros::Rate(original_fps * playback_speed), &VideoFile::publish, this);
+    if (pnh.param("publish_by_call", false)) {
+      server_ = nh.advertiseService("publish", &VideoFile::publishByCall, this);
+    } else {
+      const double original_fps(video_.get(cv::CAP_PROP_FPS));
+      if (original_fps <= 0.) {
+        NODELET_FATAL("Could not get fps from the video file");
+        return;
+      }
+      const double playback_speed(pnh.param("playback_speed", 1.));
+      if (playback_speed <= 0.) {
+        NODELET_FATAL_STREAM("Invalid playback_speed: " << playback_speed);
+        return;
+      }
+      timer_ = nh.createTimer(ros::Rate(original_fps * playback_speed), &VideoFile::publishByTimer,
+                              this);
+    }
   }
 
-  void publish(const ros::TimerEvent &) {
+  bool publish() {
     cv_bridge::CvImage image;
     image.header.stamp = ros::Time::now();
     image.header.frame_id = frame_id_;
@@ -72,7 +78,7 @@ private:
         video_.set(cv::CAP_PROP_POS_FRAMES, 0.);
       } else {
         NODELET_INFO_ONCE("No more frames to be published");
-        return;
+        return false;
       }
     }
 
@@ -82,15 +88,21 @@ private:
     // validate the image
     if (image.image.empty()) {
       NODELET_ERROR("Could not read a frame");
-      return;
+      return false;
     }
     if (image.image.type() != cv_type_) {
       NODELET_ERROR("Unexpected image type");
-      return;
+      return false;
     }
 
     publisher_.publish(image.toImageMsg());
+
+    return true;
   }
+
+  void publishByTimer(const ros::TimerEvent &) { publish(); }
+
+  bool publishByCall(std_srvs::Empty::Request &, std_srvs::Empty::Response &) { return publish(); }
 
 private:
   std::string frame_id_, encoding_;
@@ -99,6 +111,7 @@ private:
   double frame_count_;
 
   ros::Timer timer_;
+  ros::ServiceServer server_;
   image_transport::Publisher publisher_;
 
   cv::VideoCapture video_;

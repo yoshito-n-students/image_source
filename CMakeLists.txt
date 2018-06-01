@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
   std_msgs
+  std_srvs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -116,7 +117,7 @@ find_package(OpenCV REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES image_source
-  CATKIN_DEPENDS cv_bridge image_transport nodelet pluginlib roscpp sensor_msgs std_msgs
+  CATKIN_DEPENDS cv_bridge image_transport nodelet pluginlib roscpp sensor_msgs std_msgs std_srvs
 #  DEPENDS system_lib
 )
 
