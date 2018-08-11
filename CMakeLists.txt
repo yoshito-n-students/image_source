@@ -8,6 +8,7 @@ project(image_source)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  camera_info_manager
   cv_bridge
   image_transport
   nodelet
@@ -117,7 +118,16 @@ find_package(OpenCV REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES image_source
-  CATKIN_DEPENDS cv_bridge image_transport nodelet pluginlib roscpp sensor_msgs std_msgs std_srvs
+  CATKIN_DEPENDS 
+  camera_info_manager 
+  cv_bridge 
+  image_transport 
+  nodelet 
+  pluginlib 
+  roscpp 
+  sensor_msgs 
+  std_msgs 
+  std_srvs
 #  DEPENDS system_lib
 )
 
@@ -136,6 +146,7 @@ include_directories(
 add_library(
   image_source
   src/image_files.cpp
+  src/image2camera.cpp
   src/video_file.cpp
 )
 

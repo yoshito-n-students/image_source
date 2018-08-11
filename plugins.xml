@@ -2,6 +2,9 @@
     <class name="image_source/ImageFiles" type="image_source::ImageFiles" base_class_type="nodelet::Nodelet">
         <description>publish images from local image files</description>
     </class>
+    <class name="image_source/Image2Camera" type="image_source::Image2Camera" base_class_type="nodelet::Nodelet">
+        <description>convert an image topic to a camera topic</description>
+    </class>
     <class name="image_source/VideoFile" type="image_source::VideoFile" base_class_type="nodelet::Nodelet">
         <description>publish images from a local video file</description>
     </class>
