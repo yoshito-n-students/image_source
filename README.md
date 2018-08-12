@@ -62,6 +62,29 @@ publish (std_srvs/Empty)
 ~playback_speed (double, default: 1.0)
 * playback speed of video to set rate of timer
 
+## Nodelet: Image2Camera
+* publish camera using existing image topic and camera calibration
+
+### Subscribed topics
+image_in (sensor_msgs/Image)
+
+### Published topics
+image_out (sensor_msgs/Image)
+
+<camera_info_out> (sensor_msgs/CameraInfo)
+* topic name is automatically generated according to remapping of image_out
+
+### Services
+set_camera_info (sensor_msgs/SetCameraInfo)
+
+### Parameters
+~camera_name (string, default: "camera")
+* camera name to be published
+
+~camera_info_url (string, default: "")
+* camera info on startup
+* see docs of camera_info_manager for url syntax
+* standard path will be searched if empty string is given
 
 ## Examples
 see [launch/test_*.launch](launch)
