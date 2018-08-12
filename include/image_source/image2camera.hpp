@@ -29,7 +29,9 @@ private:
         nh, pnh.param< std::string >("camera_name", "camera"),
         pnh.param< std::string >("camera_info_url", "")));
 
-    publisher_ = it.advertiseCamera("camera_out", 1, true);
+    // not "camera_out" because this is base name of the image topic.
+    // name of camera info topic will be automatically generated in image_transport.
+    publisher_ = it.advertiseCamera("image_out", 1, true);
 
     const image_transport::TransportHints default_hints;
     subscriber_ = it.subscribe("image_in", 1, &Image2Camera::publish, this,

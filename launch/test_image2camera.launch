@@ -1,0 +1,23 @@
+<launch>
+    <!-- run with test_{image_files,video_file}.launch -->
+    <!-- -->
+    <!-- image publisher -->
+    <node name="camera_publisher" pkg="nodelet" type="nodelet" 
+          args="standalone image_source/Image2Camera" output="screen">
+        <remap from="image_in" to="image"/>
+        <remap from="image_out" to="camera/image"/>
+        <param name="camera_info_url" value="package://image_source/launch/camera.yml"/>
+    </node>
+    <!-- -->
+    <!-- image viewer -->
+    <node name="camera_viewer" pkg="nodelet" type="nodelet"
+          args="standalone image_view/image" output="screen">
+        <remap from="image" to="camera/image"/>
+        <param name="image_transport" value="compressed"/>
+    </node>
+    <!-- -->
+    <!-- image viewer -->
+    <node name="camera_info_echo" pkg="rostopic" type="rostopic"
+          args="echo camera/camera_info" output="screen">
+    </node>
+</launch>
