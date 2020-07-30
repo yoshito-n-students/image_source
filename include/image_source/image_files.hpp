@@ -5,9 +5,8 @@
 #include <stdexcept>
 #include <string>
 
-#include <camera_info_manager/camera_info_manager.h>
 #include <cv_bridge/cv_bridge.h>
-#include <image_transport/camera_publisher.h>
+#include <image_transport/publisher.h>
 #include <image_transport/image_transport.h>
 #include <nodelet/nodelet.h>
 #include <ros/node_handle.h>
@@ -26,7 +25,6 @@
 #include <boost/filesystem.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/regex.hpp>
-#include <boost/scoped_ptr.hpp>
 
 namespace image_source {
 
@@ -50,11 +48,7 @@ private:
       return;
     }
 
-    info_manager_.reset(new camera_info_manager::CameraInfoManager(
-        nh, pnh.param< std::string >("camera_name", "camera"),
-        pnh.param< std::string >("camera_info_url", "")));
-
-    publisher_ = image_transport::ImageTransport(nh).advertiseCamera("image_out", 1, true);
+    publisher_ = image_transport::ImageTransport(nh).advertise("image_out", 1, true);
     if (pnh.param("publish_by_call", false)) {
       server_ = nh.advertiseService("publish", &ImageFiles::publishByCall, this);
     } else {
@@ -132,13 +126,10 @@ private:
     const cv_bridge::CvImagePtr image(queue_.front());
     queue_.pop();
 
-    const sensor_msgs::CameraInfoPtr info(
-        boost::make_shared< sensor_msgs::CameraInfo >(info_manager_->getCameraInfo()));
+    image->header.stamp = ros::Time::now();
+    image->header.frame_id = frame_id_;
 
-    image->header.stamp = info->header.stamp = ros::Time::now();
-    image->header.frame_id = info->header.frame_id = frame_id_;
-
-    publisher_.publish(image->toImageMsg(), info);
+    publisher_.publish(image->toImageMsg());
 
     if (loop_) {
       queue_.push(image);
@@ -159,8 +150,7 @@ private:
 
   ros::Timer timer_;
   ros::ServiceServer server_;
-  image_transport::CameraPublisher publisher_;
-  boost::scoped_ptr< camera_info_manager::CameraInfoManager > info_manager_;
+  image_transport::Publisher publisher_;
 };
 
 } // namespace image_source
