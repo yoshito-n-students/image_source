@@ -144,10 +144,8 @@ include_directories(
 
 ## Declare a C++ library
 add_library(
-  image_source
-  src/image_files.cpp
-  src/image2camera.cpp
-  src/video_file.cpp
+  image_source_plugins
+  src/image_source_plugins.cpp
 )
 
 ## Add cmake target dependencies of the library
@@ -175,7 +173,7 @@ add_library(
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(
-  image_source
+  image_source_plugins
   ${catkin_LIBRARIES}
   ${Boost_LIBRARIES}
   ${OpenCV_LIBRARIES}

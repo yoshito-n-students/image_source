@@ -62,17 +62,14 @@ publish (std_srvs/Empty)
 ~playback_speed (double, default: 1.0)
 * playback speed of video to set rate of timer
 
-## Nodelet: Image2Camera
-* publish camera using existing image topic and camera calibration
+## Nodelet: CameraInfo
+* publish camera calibration info synchronizing image messages
 
 ### Subscribed topics
 image_in (sensor_msgs/Image)
 
 ### Published topics
-image_out (sensor_msgs/Image)
-
-<camera_info_out> (sensor_msgs/CameraInfo)
-* topic name is automatically generated according to remapping of image_out
+camera_info (sensor_msgs/CameraInfo)
 
 ### Services
 set_camera_info (sensor_msgs/SetCameraInfo)
