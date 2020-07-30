@@ -1,6 +1,8 @@
 #ifndef IMAGE_SOURCE_VIDEO_FILE_HPP
 #define IMAGE_SOURCE_VIDEO_FILE_HPP
 
+#include <string>
+
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
 #include <image_transport/publisher.h>
