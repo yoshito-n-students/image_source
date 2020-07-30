@@ -27,6 +27,7 @@ private:
     info_manager_.reset(new camera_info_manager::CameraInfoManager(
         nh, pnh.param< std::string >("camera_name", "camera"),
         pnh.param< std::string >("camera_info_url", "")));
+    frame_id_ = pnh.param< std::string >("frame_id", "");
 
     publisher_ = nh.advertise< sensor_msgs::CameraInfo >("camera_info", 1, true);
 
@@ -39,14 +40,17 @@ private:
   void publish(const sensor_msgs::ImageConstPtr &image) {
     const sensor_msgs::CameraInfoPtr info(
         new sensor_msgs::CameraInfo(info_manager_->getCameraInfo()));
-    info->header = image->header;
+    info->header.stamp = image->header.stamp;
+    info->header.frame_id = frame_id_;
     publisher_.publish(info);
   }
 
 private:
-  image_transport::Subscriber subscriber_;
-  ros::Publisher publisher_;
   boost::scoped_ptr< camera_info_manager::CameraInfoManager > info_manager_;
+  std::string frame_id_;
+
+  ros::Publisher publisher_;
+  image_transport::Subscriber subscriber_;
 };
 
 } // namespace image_source

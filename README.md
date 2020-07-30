@@ -70,6 +70,7 @@ image_in (sensor_msgs/Image)
 
 ### Published topics
 camera_info (sensor_msgs/CameraInfo)
+* the stamp of a message is copied from that of the subscribed image
 
 ### Services
 set_camera_info (sensor_msgs/SetCameraInfo)
@@ -82,6 +83,9 @@ set_camera_info (sensor_msgs/SetCameraInfo)
 * camera info on startup
 * see docs of camera_info_manager for url syntax
 * standard path will be searched if empty string is given
+
+~frame_id (string, default: "")
+* frame id of published camera info
 
 ## Examples
 see [launch/test_*.launch](launch)
