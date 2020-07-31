@@ -28,13 +28,14 @@ private:
 
     frame_id_ = pnh.param< std::string >("frame_id", "");
     fov_ = optionalParam< double >(pnh, "fov");
-    if (!fov_) {
-      fov_x_ = optionalParam< double >(pnh, "fov_x");
-      fov_y_ = optionalParam< double >(pnh, "fov_y");
+    fov_x_ = optionalParam< double >(pnh, "fov_x");
+    fov_y_ = optionalParam< double >(pnh, "fov_y");
+    if (!fov_ && !fov_x_) {
+      throw ros::Exception("AutoCameraInfo::onInit(): '" + pnh.resolveName("fov") + "' or '" +
+                           pnh.resolveName("fov_x") + "' must be given");
     }
-    if (!fov_ && !(fov_x_ && fov_y_)) {
-      throw ros::Exception("AutoCameraInfo::onInit(): '" + pnh.resolveName("fov") +
-                           "' or both of '" + pnh.resolveName("fov_x") + "' and '" +
+    if (!fov_ && !fov_y_) {
+      throw ros::Exception("AutoCameraInfo::onInit(): '" + pnh.resolveName("fov") + "' or '" +
                            pnh.resolveName("fov_y") + "' must be given");
     }
 
@@ -61,7 +62,8 @@ private:
     const double cx(info->width / 2.), cy(info->height / 2.);
     const double fx(fov_x_ ? cx / std::tan(*fov_x_ / 2.)
                            : std::sqrt(cx * cx + cy * cy) / std::tan(*fov_ / 2.));
-    const double fy(fov_y_ ? cy / std::tan(*fov_y_ / 2.) : fx);
+    const double fy(fov_y_ ? cy / std::tan(*fov_y_ / 2.)
+                           : std::sqrt(cx * cx + cy * cy) / std::tan(*fov_ / 2.));
     info->K[0] = fx;
     info->K[1] = 0.;
     info->K[2] = cx;

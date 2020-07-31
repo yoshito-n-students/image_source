@@ -106,7 +106,7 @@ camera_info (sensor_msgs/CameraInfo)
 ~fov (double, required if ~fov_x or ~fov_y is not set)
 * camera's diagonal field of view in radians
 
-~fov_x, ~fov_y (double, requiref if ~fov is not set)
+~fov_x, ~fov_y (double, optional)
 * camera's horizontal or vertical field of view in radians
 
 ## Examples
