@@ -18,6 +18,11 @@
 namespace image_source {
 
 class CameraInfo : public nodelet::Nodelet {
+public:
+  CameraInfo() {}
+
+  virtual ~CameraInfo() {}
+
 protected:
   virtual void onInit() {
     ros::NodeHandle &nh(getNodeHandle());
