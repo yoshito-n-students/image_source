@@ -20,7 +20,7 @@
 namespace image_source {
 
 class AutoCameraInfo : public nodelet::Nodelet {
-private:
+protected:
   virtual void onInit() {
     ros::NodeHandle &nh(getNodeHandle());
     ros::NodeHandle &pnh(getPrivateNodeHandle());
@@ -109,7 +109,7 @@ private:
     return boost::make_optional(nh.getParam(key, val), val);
   }
 
-private:
+protected:
   std::string frame_id_;
   boost::optional< double > fov_, fov_x_, fov_y_;
 

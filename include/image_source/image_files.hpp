@@ -34,7 +34,7 @@ public:
 
   virtual ~ImageFiles() {}
 
-private:
+protected:
   virtual void onInit() {
     ros::NodeHandle &nh(getNodeHandle());
     ros::NodeHandle &pnh(getPrivateNodeHandle());
@@ -142,7 +142,7 @@ private:
 
   bool publishByCall(std_srvs::Empty::Request &, std_srvs::Empty::Response &) { return publish(); }
 
-private:
+protected:
   bool loop_;
   std::string frame_id_;
 

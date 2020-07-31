@@ -18,7 +18,7 @@
 namespace image_source {
 
 class CameraInfo : public nodelet::Nodelet {
-private:
+protected:
   virtual void onInit() {
     ros::NodeHandle &nh(getNodeHandle());
     ros::NodeHandle &pnh(getPrivateNodeHandle());
@@ -45,7 +45,7 @@ private:
     publisher_.publish(info);
   }
 
-private:
+protected:
   boost::scoped_ptr< camera_info_manager::CameraInfoManager > info_manager_;
   std::string frame_id_;
 

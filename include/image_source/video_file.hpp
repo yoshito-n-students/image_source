@@ -21,9 +21,10 @@ namespace image_source {
 class VideoFile : public nodelet::Nodelet {
 public:
   VideoFile() {}
+
   virtual ~VideoFile() {}
 
-private:
+protected:
   virtual void onInit() {
     ros::NodeHandle &nh(getNodeHandle());
     ros::NodeHandle &pnh(getPrivateNodeHandle());
@@ -106,7 +107,7 @@ private:
 
   bool publishByCall(std_srvs::Empty::Request &, std_srvs::Empty::Response &) { return publish(); }
 
-private:
+protected:
   std::string frame_id_, encoding_;
   int cv_type_;
   bool loop_;
