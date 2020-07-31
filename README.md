@@ -64,6 +64,7 @@ publish (std_srvs/Empty)
 
 ## Nodelet: CameraInfo
 * publish camera calibration info synchronizing image messages
+* requires full description of the published camera info
 
 ### Subscribed topics
 image_in (sensor_msgs/Image)
@@ -77,7 +78,7 @@ set_camera_info (sensor_msgs/SetCameraInfo)
 
 ### Parameters
 ~camera_name (string, default: "camera")
-* camera name to be published
+* camera name used to load camera info
 
 ~camera_info_url (string, default: "")
 * camera info on startup
@@ -86,6 +87,27 @@ set_camera_info (sensor_msgs/SetCameraInfo)
 
 ~frame_id (string, default: "")
 * frame id of published camera info
+
+## Nodelet: AutoCameraInfo
+* publish camera calibration info synchronizing image messages
+* requires only camera's field of view
+
+### Subscribed topics
+image_in (sensor_msgs/Image)
+
+### Published topics
+camera_info (sensor_msgs/CameraInfo)
+* the stamp of a message is copied from that of the subscribed image
+
+### Parameters
+~frame_id (string, default: "")
+* frame id of published camera info
+
+~fov (double, required if ~fov_x or ~fov_y is not set)
+* camera's diagonal field of view in radians
+
+~fov_x, ~fov_y (double, requiref if ~fov is not set)
+* camera's horizontal or vertical field of view in radians
 
 ## Examples
 see [launch/test_*.launch](launch)
