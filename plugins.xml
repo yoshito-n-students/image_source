@@ -1,8 +1,23 @@
-<library path="lib/libimage_source">
-    <class name="image_source/ImageFiles" type="image_source::ImageFiles" base_class_type="nodelet::Nodelet">
+<library path="lib/libimage_source_plugins">
+
+    <class name="image_source/AutoCameraInfo" type="image_source::AutoCameraInfo" 
+           base_class_type="nodelet::Nodelet">
+        <description>publish camera info synchronizing image messages</description>
+    </class>
+
+    <class name="image_source/CameraInfo" type="image_source::CameraInfo"
+           base_class_type="nodelet::Nodelet">
+        <description>publish camera info synchronizing image messages</description>
+    </class>
+
+    <class name="image_source/ImageFiles" type="image_source::ImageFiles" 
+           base_class_type="nodelet::Nodelet">
         <description>publish images from local image files</description>
     </class>
-    <class name="image_source/VideoFile" type="image_source::VideoFile" base_class_type="nodelet::Nodelet">
+
+    <class name="image_source/VideoFile" type="image_source::VideoFile" 
+           base_class_type="nodelet::Nodelet">
         <description>publish images from a local video file</description>
     </class>
+
 </library>

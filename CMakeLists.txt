@@ -8,6 +8,7 @@ project(image_source)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  camera_info_manager
   cv_bridge
   image_transport
   nodelet
@@ -15,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
   std_msgs
+  std_srvs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -116,7 +118,16 @@ find_package(OpenCV REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES image_source
-  CATKIN_DEPENDS cv_bridge image_transport nodelet pluginlib roscpp sensor_msgs std_msgs
+  CATKIN_DEPENDS 
+  camera_info_manager 
+  cv_bridge 
+  image_transport 
+  nodelet 
+  pluginlib 
+  roscpp 
+  sensor_msgs 
+  std_msgs 
+  std_srvs
 #  DEPENDS system_lib
 )
 
@@ -133,9 +144,8 @@ include_directories(
 
 ## Declare a C++ library
 add_library(
-  image_source
-  src/image_files.cpp
-  src/video_file.cpp
+  image_source_plugins
+  src/image_source_plugins.cpp
 )
 
 ## Add cmake target dependencies of the library
@@ -163,7 +173,7 @@ add_library(
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(
-  image_source
+  image_source_plugins
   ${catkin_LIBRARIES}
   ${Boost_LIBRARIES}
   ${OpenCV_LIBRARIES}
