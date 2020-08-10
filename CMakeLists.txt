@@ -117,7 +117,7 @@ find_package(OpenCV REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES image_source
+  LIBRARIES image_source_plugins
   CATKIN_DEPENDS 
   camera_info_manager 
   cv_bridge 
