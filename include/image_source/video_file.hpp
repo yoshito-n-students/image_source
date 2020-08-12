@@ -69,9 +69,9 @@ protected:
     }
   }
 
-  bool publish() {
+  bool publish(const ros::Time &stamp) {
     cv_bridge::CvImage image;
-    image.header.stamp = ros::Time::now();
+    image.header.stamp = stamp;
     image.header.frame_id = frame_id_;
     image.encoding = encoding_;
 
@@ -103,9 +103,11 @@ protected:
     return true;
   }
 
-  void publishByTimer(const ros::TimerEvent &) { publish(); }
+  void publishByTimer(const ros::TimerEvent &event) { publish(event.current_expected); }
 
-  bool publishByCall(std_srvs::Empty::Request &, std_srvs::Empty::Response &) { return publish(); }
+  bool publishByCall(std_srvs::Empty::Request &, std_srvs::Empty::Response &) {
+    return publish(ros::Time::now());
+  }
 
 protected:
   std::string frame_id_, encoding_;
