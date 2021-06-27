@@ -26,15 +26,15 @@ public:
 
 protected:
   virtual void onInit() {
-    ros::NodeHandle &nh(getNodeHandle());
-    ros::NodeHandle &pnh(getPrivateNodeHandle());
+    ros::NodeHandle &nh = getNodeHandle();
+    ros::NodeHandle &pnh = getPrivateNodeHandle();
 
-    frame_id_ = pnh.param< std::string >("frame_id", "");
-    encoding_ = pnh.param< std::string >("encoding", "bgr8");
+    frame_id_ = pnh.param<std::string>("frame_id", "");
+    encoding_ = pnh.param<std::string>("encoding", "bgr8");
     cv_type_ = cv_bridge::getCvType(encoding_);
     loop_ = pnh.param("loop", false);
 
-    const std::string filename(pnh.param< std::string >("file", ""));
+    const std::string filename = pnh.param<std::string>("file", "");
     if (filename.empty()) {
       NODELET_FATAL("No video filename");
       return;
@@ -54,12 +54,12 @@ protected:
     if (pnh.param("publish_by_call", false)) {
       server_ = nh.advertiseService("publish", &VideoFile::publishByCall, this);
     } else {
-      const double original_fps(video_.get(cv::CAP_PROP_FPS));
+      const double original_fps = video_.get(cv::CAP_PROP_FPS);
       if (original_fps <= 0.) {
         NODELET_FATAL("Could not get fps from the video file");
         return;
       }
-      const double playback_speed(pnh.param("playback_speed", 1.));
+      const double playback_speed = pnh.param("playback_speed", 1.);
       if (playback_speed <= 0.) {
         NODELET_FATAL_STREAM("Invalid playback_speed: " << playback_speed);
         return;

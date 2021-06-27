@@ -2,6 +2,10 @@
 Changelog for package image_source
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.3 (2021-06-XX)
+------------------
+* C++11
+
 0.0.2 (2020-08-10)
 ------------------
 * Fix wrong library exportation

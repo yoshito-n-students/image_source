@@ -25,21 +25,21 @@ public:
 
 protected:
   virtual void onInit() {
-    ros::NodeHandle &nh(getNodeHandle());
-    ros::NodeHandle &pnh(getPrivateNodeHandle());
-    image_transport::ImageTransport it(nh);
+    ros::NodeHandle &nh = getNodeHandle();
+    ros::NodeHandle &pnh = getPrivateNodeHandle();
 
     info_manager_.reset(new camera_info_manager::CameraInfoManager(
-        nh, pnh.param< std::string >("camera_name", "camera"),
-        pnh.param< std::string >("camera_info_url", "")));
-    frame_id_ = pnh.param< std::string >("frame_id", "");
+        nh, pnh.param<std::string>("camera_name", "camera"),
+        pnh.param<std::string>("camera_info_url", "")));
+    frame_id_ = pnh.param<std::string>("frame_id", "");
 
-    publisher_ = nh.advertise< sensor_msgs::CameraInfo >("camera_info", 1, true);
+    publisher_ = nh.advertise<sensor_msgs::CameraInfo>("camera_info", 1, true);
 
-    const image_transport::TransportHints default_hints;
-    subscriber_ = it.subscribe("image_in", 1, &CameraInfo::publish, this,
-                               image_transport::TransportHints(default_hints.getTransport(),
-                                                               default_hints.getRosHints(), pnh));
+    static const image_transport::TransportHints default_hints;
+    subscriber_ = image_transport::ImageTransport(nh).subscribe(
+        "image_in", 1, &CameraInfo::publish, this,
+        image_transport::TransportHints(default_hints.getTransport(), default_hints.getRosHints(),
+                                        pnh));
   }
 
   void publish(const sensor_msgs::ImageConstPtr &image) {
@@ -51,7 +51,7 @@ protected:
   }
 
 protected:
-  boost::scoped_ptr< camera_info_manager::CameraInfoManager > info_manager_;
+  boost::scoped_ptr<camera_info_manager::CameraInfoManager> info_manager_;
   std::string frame_id_;
 
   ros::Publisher publisher_;
